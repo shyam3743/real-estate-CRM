@@ -318,7 +318,7 @@ export default function ChannelPartners() {
                           step="0.1"
                           min="0"
                           max="100"
-                          value={newPartner.commissionRate || ""}
+                          value={newPartner.commissionRate?.toString() || ""}
                           onChange={(e) => setNewPartner({ ...newPartner, commissionRate: parseFloat(e.target.value) })}
                           data-testid="input-partner-commissionRate"
                         />

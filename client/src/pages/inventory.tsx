@@ -69,7 +69,7 @@ export default function Inventory() {
   }
 
   const totalUnits = projects.reduce((sum, p) => sum + p.totalUnits, 0);
-  const soldUnits = projects.reduce((sum, p) => sum + p.soldUnits, 0);
+  const soldUnits = projects.reduce((sum, p) => sum + (p.soldUnits || 0), 0);
   const availableUnits = projects.reduce((sum, p) => sum + p.availableUnits, 0);
   const reservedUnits = 0; // This would come from actual unit data
 
@@ -215,7 +215,7 @@ export default function Inventory() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {projects.map((project) => {
               const occupancyPercentage = project.totalUnits > 0 ? 
-                Math.round((project.soldUnits / project.totalUnits) * 100) : 0;
+                Math.round(((project.soldUnits || 0) / project.totalUnits) * 100) : 0;
               
               return (
                 <Card key={project.id} className="hover:shadow-lg transition-shadow" data-testid={`project-inventory-${project.id}`}>

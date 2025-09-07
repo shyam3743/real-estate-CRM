@@ -20,14 +20,14 @@ export default function Projects() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddProjectOpen, setIsAddProjectOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [newProject, setNewProject] = useState<Partial<InsertProject>>({
+  const [newProject, setNewProject] = useState({
     name: "",
     description: "",
     location: "",
-    totalUnits: 0,
-    availableUnits: 0,
-    startingPrice: 0,
-    endingPrice: 0,
+    totalUnits: "",
+    availableUnits: "",
+    startingPrice: "",
+    endingPrice: "",
     imageUrl: "",
   });
 
@@ -47,10 +47,10 @@ export default function Projects() {
         name: "",
         description: "",
         location: "",
-        totalUnits: 0,
-        availableUnits: 0,
-        startingPrice: 0,
-        endingPrice: 0,
+        totalUnits: "",
+        availableUnits: "",
+        startingPrice: "",
+        endingPrice: "",
         imageUrl: "",
       });
       toast({
@@ -89,7 +89,7 @@ export default function Projects() {
   };
 
   const getOccupancyPercentage = (project: Project) => {
-    return project.totalUnits > 0 ? Math.round((project.soldUnits / project.totalUnits) * 100) : 0;
+    return project.totalUnits > 0 ? Math.round(((project.soldUnits || 0) / project.totalUnits) * 100) : 0;
   };
 
   const handleAddProject = (e: React.FormEvent) => {
@@ -108,11 +108,11 @@ export default function Projects() {
       name: newProject.name!,
       description: newProject.description || null,
       location: newProject.location!,
-      totalUnits: Number(newProject.totalUnits!),
-      availableUnits: Number(newProject.availableUnits!) || Number(newProject.totalUnits!),
+      totalUnits: parseInt(newProject.totalUnits!) || 0,
+      availableUnits: parseInt(newProject.availableUnits!) || parseInt(newProject.totalUnits!) || 0,
       soldUnits: 0,
-      startingPrice: newProject.startingPrice ? Number(newProject.startingPrice) : null,
-      endingPrice: newProject.endingPrice ? Number(newProject.endingPrice) : null,
+      startingPrice: newProject.startingPrice ? parseFloat(newProject.startingPrice) : null,
+      endingPrice: newProject.endingPrice ? parseFloat(newProject.endingPrice) : null,
       imageUrl: newProject.imageUrl || null,
       isActive: true,
     };
@@ -274,8 +274,8 @@ export default function Projects() {
                           <Input
                             id="totalUnits"
                             type="number"
-                            value={newProject.totalUnits || ""}
-                            onChange={(e) => setNewProject({ ...newProject, totalUnits: parseInt(e.target.value) })}
+                            value={newProject.totalUnits?.toString() || ""}
+                            onChange={(e) => setNewProject({ ...newProject, totalUnits: e.target.value })}
                             required
                             data-testid="input-project-totalUnits"
                           />
@@ -285,8 +285,8 @@ export default function Projects() {
                           <Input
                             id="availableUnits"
                             type="number"
-                            value={newProject.availableUnits || ""}
-                            onChange={(e) => setNewProject({ ...newProject, availableUnits: parseInt(e.target.value) })}
+                            value={newProject.availableUnits?.toString() || ""}
+                            onChange={(e) => setNewProject({ ...newProject, availableUnits: e.target.value })}
                             data-testid="input-project-availableUnits"
                           />
                         </div>
@@ -298,8 +298,8 @@ export default function Projects() {
                           <Input
                             id="startingPrice"
                             type="number"
-                            value={newProject.startingPrice || ""}
-                            onChange={(e) => setNewProject({ ...newProject, startingPrice: parseFloat(e.target.value) })}
+                            value={newProject.startingPrice?.toString() || ""}
+                            onChange={(e) => setNewProject({ ...newProject, startingPrice: e.target.value })}
                             data-testid="input-project-startingPrice"
                           />
                         </div>
@@ -308,8 +308,8 @@ export default function Projects() {
                           <Input
                             id="endingPrice"
                             type="number"
-                            value={newProject.endingPrice || ""}
-                            onChange={(e) => setNewProject({ ...newProject, endingPrice: parseFloat(e.target.value) })}
+                            value={newProject.endingPrice?.toString() || ""}
+                            onChange={(e) => setNewProject({ ...newProject, endingPrice: e.target.value })}
                             data-testid="input-project-endingPrice"
                           />
                         </div>
