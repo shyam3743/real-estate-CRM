@@ -22,13 +22,13 @@ export default function ChannelPartners() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isAddPartnerOpen, setIsAddPartnerOpen] = useState(false);
   const [selectedPartner, setSelectedPartner] = useState<ChannelPartner | null>(null);
-  const [newPartner, setNewPartner] = useState<Partial<InsertChannelPartner>>({
+  const [newPartner, setNewPartner] = useState({
     name: "",
     companyName: "",
     email: "",
     phone: "",
     address: "",
-    commissionRate: 0,
+    commissionRate: "",
   });
 
   const { data: partners = [], isLoading } = useQuery<ChannelPartner[]>({
@@ -49,7 +49,7 @@ export default function ChannelPartners() {
         email: "",
         phone: "",
         address: "",
-        commissionRate: 0,
+        commissionRate: "",
       });
       toast({
         title: "Channel partner added successfully",
@@ -110,7 +110,7 @@ export default function ChannelPartners() {
       email: newPartner.email!,
       phone: newPartner.phone!,
       address: newPartner.address || null,
-      commissionRate: newPartner.commissionRate || 0,
+      commissionRate: newPartner.commissionRate ? newPartner.commissionRate.toString() : "0",
       totalLeads: 0,
       totalSales: 0,
       totalCommission: 0,
@@ -319,7 +319,7 @@ export default function ChannelPartners() {
                           min="0"
                           max="100"
                           value={newPartner.commissionRate?.toString() || ""}
-                          onChange={(e) => setNewPartner({ ...newPartner, commissionRate: parseFloat(e.target.value) })}
+                          onChange={(e) => setNewPartner({ ...newPartner, commissionRate: e.target.value })}
                           data-testid="input-partner-commissionRate"
                         />
                       </div>

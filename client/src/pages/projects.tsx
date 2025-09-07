@@ -111,8 +111,8 @@ export default function Projects() {
       totalUnits: parseInt(newProject.totalUnits!) || 0,
       availableUnits: parseInt(newProject.availableUnits!) || parseInt(newProject.totalUnits!) || 0,
       soldUnits: 0,
-      startingPrice: newProject.startingPrice ? parseFloat(newProject.startingPrice) : null,
-      endingPrice: newProject.endingPrice ? parseFloat(newProject.endingPrice) : null,
+      startingPrice: newProject.startingPrice ? newProject.startingPrice.toString() : null,
+      endingPrice: newProject.endingPrice ? newProject.endingPrice.toString() : null,
       imageUrl: newProject.imageUrl || null,
       isActive: true,
     };
@@ -199,7 +199,7 @@ export default function Projects() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-orange-600" data-testid="stat-sold-units">
-                      {projects.reduce((sum, p) => sum + p.soldUnits, 0)}
+                      {projects.reduce((sum, p) => sum + (p.soldUnits || 0), 0)}
                     </p>
                     <p className="text-sm text-muted-foreground">Units Sold</p>
                   </div>

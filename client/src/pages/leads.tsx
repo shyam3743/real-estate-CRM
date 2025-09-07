@@ -158,7 +158,7 @@ export default function Leads() {
       phone: newLead.phone!,
       source: newLead.source as any,
       status: newLead.status as any,
-      budget: newLead.budget ? parseFloat(newLead.budget as string) : null,
+      budget: newLead.budget ? (typeof newLead.budget === 'string' ? newLead.budget : newLead.budget.toString()) : null,
       requirements: newLead.requirements || null,
       assignedTo: null,
       projectInterest: null,
