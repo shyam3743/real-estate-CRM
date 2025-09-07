@@ -85,11 +85,11 @@ export interface IStorage {
     topPerformers: { userId: string; userName: string; sales: string; deals: number }[];
   }>;
 
-  sessionStore: session.SessionStore;
+  sessionStore: session.Store;
 }
 
 export class DatabaseStorage implements IStorage {
-  sessionStore: session.SessionStore;
+  sessionStore: session.Store;
 
   constructor() {
     this.sessionStore = new PostgresSessionStore({ pool, createTableIfMissing: true });
@@ -315,10 +315,14 @@ export class DatabaseStorage implements IStorage {
     const [{ count: activeProjects }] = await db.select({ count: sql`count(*)`.mapWith(Number) }).from(projects).where(eq(projects.isActive, true));
 
     // Leads by status
-    const leadsByStatus = await db.select({
+    const leadsByStatusRaw = await db.select({
       status: leads.status,
       count: sql`count(*)`.mapWith(Number)
     }).from(leads).groupBy(leads.status);
+    const leadsByStatus = leadsByStatusRaw.map(row => ({ 
+      status: row.status || 'unknown', 
+      count: row.count 
+    }));
 
     // Leads by source
     const leadsBySource = await db.select({
