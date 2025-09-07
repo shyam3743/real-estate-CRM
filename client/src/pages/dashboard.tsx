@@ -12,8 +12,18 @@ import {
 } from "lucide-react";
 import { Lead } from "@shared/schema";
 
+interface DashboardMetrics {
+  totalLeads: number;
+  monthlyRevenue: string;
+  conversionRate: number;
+  activeProjects: number;
+  leadsByStatus: { status: string; count: number }[];
+  leadsBySource: { source: string; count: number }[];
+  topPerformers: { userId: string; userName: string; sales: string; deals: number }[];
+}
+
 export default function Dashboard() {
-  const { data: metrics, isLoading: metricsLoading } = useQuery({
+  const { data: metrics, isLoading: metricsLoading } = useQuery<DashboardMetrics>({
     queryKey: ["/api/dashboard/metrics"],
   });
 
@@ -300,7 +310,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {metrics?.topPerformers?.slice(0, 4).map((performer, index) => (
+                  {(metrics?.topPerformers || []).slice(0, 4).map((performer, index) => (
                     <div key={performer.userId} className="flex items-center space-x-4">
                       <div className={`flex items-center justify-center w-8 h-8 rounded-full text-white font-bold text-sm ${
                         index === 0 ? "bg-gradient-to-br from-yellow-400 to-yellow-600" :
