@@ -96,7 +96,7 @@ export default function Customers() {
       leadId: null,
       firstName: newCustomer.firstName!,
       lastName: newCustomer.lastName!,
-      email: newCustomer.email || null,
+      email: newCustomer.email || undefined,
       phone: newCustomer.phone!,
       address: newCustomer.address || null,
       panNumber: newCustomer.panNumber || null,

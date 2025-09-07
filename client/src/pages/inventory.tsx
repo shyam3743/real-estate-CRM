@@ -20,10 +20,13 @@ export default function Inventory() {
     queryKey: ["/api/projects"],
   });
 
-  // For demo purposes, we'll create mock units data since the API endpoint might not be set up yet
-  const mockUnits: Unit[] = [];
+  // Fetch units from API
+  const { data: units = [], isLoading: unitsLoading, error: unitsError } = useQuery<Unit[]>({
+    queryKey: ["/api/units"],
+    enabled: true, // Enable the query by default
+  });
 
-  const filteredUnits = mockUnits.filter((unit) => {
+  const filteredUnits = units.filter((unit) => {
     const matchesSearch = unit.unitNumber.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === "all" || unit.status === statusFilter;
     const matchesProject = projectFilter === "all" || unit.projectId === projectFilter;
@@ -276,15 +279,72 @@ export default function Inventory() {
             })}
           </div>
 
-          {/* Empty State for Units */}
-          <Card>
-            <CardContent className="p-12 text-center" data-testid="no-units-message">
-              <Home className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-foreground mb-2">Unit Inventory</h3>
-              <p className="text-muted-foreground mb-4">
-                Detailed unit inventory will be displayed here. Units are organized by projects and towers.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-2xl mx-auto">
+          {/* Loading State */}
+          {unitsLoading && (
+            <Card>
+              <CardContent className="p-12 text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                <p className="text-muted-foreground">Loading units...</p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Error State */}
+          {unitsError && (
+            <Card>
+              <CardContent className="p-6 text-center">
+                <p className="text-red-600 mb-2">Error loading units</p>
+                <p className="text-sm text-muted-foreground">Please try refreshing the page</p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Units Data Display */}
+          {!unitsLoading && !unitsError && (
+            <>
+              {/* Show actual units if available */}
+              {filteredUnits.length > 0 ? (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Unit Inventory ({filteredUnits.length} units)</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {filteredUnits.map((unit) => (
+                        <div key={unit.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                          <div className="flex justify-between items-start mb-2">
+                            <h4 className="font-medium">{unit.unitNumber}</h4>
+                            <Badge variant={unit.status === 'available' ? 'default' : 
+                                          unit.status === 'sold' ? 'destructive' : 
+                                          unit.status === 'reserved' ? 'secondary' : 'outline'}>
+                              {unit.status}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-2">{unit.type}</p>
+                          <p className="text-sm text-muted-foreground mb-2">Floor {unit.floor}</p>
+                          <p className="text-sm text-muted-foreground mb-2">{unit.area} sq ft</p>
+                          <p className="font-medium text-primary">₹{parseFloat(unit.price).toLocaleString()}</p>
+                          <Button size="sm" variant="outline" className="mt-2 w-full">
+                            <Eye className="w-4 h-4 mr-2" />
+                            View Details
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                /* Empty State for Units */
+                <Card>
+                  <CardContent className="p-12 text-center" data-testid="no-units-message">
+                    <Home className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-foreground mb-2">No Units Found</h3>
+                    <p className="text-muted-foreground mb-4">
+                      {searchQuery || statusFilter !== 'all' || projectFilter !== 'all' || typeFilter !== 'all' 
+                        ? 'No units match your current filters. Try adjusting your search criteria.'
+                        : 'No units have been added to the system yet. Units will appear here once they are created.'}
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-2xl mx-auto">
                 <div className="bg-muted rounded-lg p-4">
                   <h4 className="font-medium text-foreground mb-2">Unit Details</h4>
                   <ul className="text-sm text-muted-foreground space-y-1">
@@ -315,6 +375,9 @@ export default function Inventory() {
               </div>
             </CardContent>
           </Card>
+              )}
+            </>
+          )}
         </main>
       </div>
     </div>

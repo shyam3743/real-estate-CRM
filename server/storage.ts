@@ -66,6 +66,7 @@ export interface IStorage {
 
   // Payment management
   createPayment(payment: InsertPayment): Promise<Payment>;
+  getAllPayments(): Promise<Payment[]>;
   getPaymentsByBooking(bookingId: string): Promise<Payment[]>;
   getPaymentsByCustomer(customerId: string): Promise<Payment[]>;
 
@@ -264,6 +265,10 @@ export class DatabaseStorage implements IStorage {
   async createPayment(insertPayment: InsertPayment): Promise<Payment> {
     const [payment] = await db.insert(payments).values(insertPayment).returning();
     return payment;
+  }
+
+  async getAllPayments(): Promise<Payment[]> {
+    return await db.select().from(payments).orderBy(desc(payments.createdAt));
   }
 
   async getPaymentsByBooking(bookingId: string): Promise<Payment[]> {

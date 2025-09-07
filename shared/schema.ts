@@ -278,61 +278,93 @@ export const paymentsRelations = relations(payments, ({ one }) => ({
   }),
 }));
 
-// Insert schemas
+// Insert schemas with enhanced validation
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  email: z.string().email("Invalid email format"),
 });
 
 export const insertProjectSchema = createInsertSchema(projects).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  totalUnits: z.number().int().min(0, "Total units must be non-negative"),
+  availableUnits: z.number().int().min(0, "Available units must be non-negative"),
+  soldUnits: z.number().int().min(0, "Sold units must be non-negative").optional(),
 });
 
 export const insertTowerSchema = createInsertSchema(towers).omit({
   id: true,
   createdAt: true,
+}).extend({
+  totalFloors: z.number().int().min(1, "Total floors must be at least 1"),
+  unitsPerFloor: z.number().int().min(1, "Units per floor must be at least 1"),
+  totalUnits: z.number().int().min(1, "Total units must be at least 1"),
 });
 
 export const insertUnitSchema = createInsertSchema(units).omit({
   id: true,
   createdAt: true,
+}).extend({
+  floor: z.number().int().min(0, "Floor must be non-negative"),
+  area: z.string().refine(val => !isNaN(parseFloat(val)) && parseFloat(val) > 0, "Area must be a positive number"),
+  price: z.string().refine(val => !isNaN(parseFloat(val)) && parseFloat(val) > 0, "Price must be a positive number"),
 });
 
 export const insertLeadSchema = createInsertSchema(leads).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  email: z.string().email("Invalid email format").optional().or(z.literal("")),
 });
 
 export const insertCommunicationSchema = createInsertSchema(communications).omit({
   id: true,
   createdAt: true,
+}).extend({
+  duration: z.number().int().min(0, "Duration must be non-negative").optional(),
 });
 
 export const insertCustomerSchema = createInsertSchema(customers).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  email: z.string().email("Invalid email format").optional().or(z.literal("")),
 });
 
 export const insertBookingSchema = createInsertSchema(bookings).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  totalAmount: z.string().refine(val => !isNaN(parseFloat(val)) && parseFloat(val) > 0, "Total amount must be positive"),
+  paidAmount: z.string().refine(val => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, "Paid amount must be non-negative").optional(),
+  balanceAmount: z.string().refine(val => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, "Balance amount must be non-negative"),
 });
 
 export const insertPaymentSchema = createInsertSchema(payments).omit({
   id: true,
   createdAt: true,
+}).extend({
+  amount: z.string().refine(val => !isNaN(parseFloat(val)) && parseFloat(val) > 0, "Amount must be positive"),
 });
 
 export const insertChannelPartnerSchema = createInsertSchema(channelPartners).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  email: z.string().email("Invalid email format"),
+  commissionRate: z.string().refine(val => !isNaN(parseFloat(val)) && parseFloat(val) >= 0 && parseFloat(val) <= 100, "Commission rate must be between 0 and 100").optional(),
+  totalLeads: z.number().int().min(0, "Total leads must be non-negative").optional(),
+  totalSales: z.string().refine(val => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, "Total sales must be non-negative").optional(),
+  totalCommission: z.string().refine(val => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, "Total commission must be non-negative").optional(),
 });
 
 // Types

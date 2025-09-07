@@ -21,11 +21,17 @@ export default function Payments() {
   const [methodFilter, setMethodFilter] = useState<string>("all");
   const [isAddPaymentOpen, setIsAddPaymentOpen] = useState(false);
 
-  // Mock data for payments - in a real app, this would come from the API
-  const mockPayments: Payment[] = [];
-  const mockBookings: Booking[] = [];
+  // Fetch payments from API
+  const { data: payments = [], isLoading: paymentsLoading, error: paymentsError } = useQuery<Payment[]>({
+    queryKey: ["/api/payments"],
+  });
 
-  const filteredPayments = mockPayments.filter((payment) => {
+  // Fetch bookings from API for payment creation
+  const { data: bookings = [], isLoading: bookingsLoading } = useQuery<Booking[]>({
+    queryKey: ["/api/bookings"],
+  });
+
+  const filteredPayments = payments.filter((payment) => {
     const matchesSearch = payment.receiptNumber?.toLowerCase().includes(searchQuery.toLowerCase()) || false;
     const matchesStatus = statusFilter === "all" || payment.status === statusFilter;
     const matchesMethod = methodFilter === "all" || payment.paymentMethod === methodFilter;
@@ -55,13 +61,13 @@ export default function Payments() {
     }
   };
 
-  // Calculate stats from mock data
-  const totalPayments = mockPayments.length;
-  const completedPayments = mockPayments.filter(p => p.status === 'completed').length;
-  const pendingPayments = mockPayments.filter(p => p.status === 'pending').length;
-  const totalAmount = mockPayments
-    .filter(p => p.status === 'completed')
-    .reduce((sum, p) => sum + parseFloat(p.amount.toString()), 0);
+  // Calculate stats from payments data
+  const totalPayments = payments.length;
+  const completedPayments = payments.filter((p: Payment) => p.status === 'completed').length;
+  const pendingPayments = payments.filter((p: Payment) => p.status === 'pending').length;
+  const totalAmount = payments
+    .filter((p: Payment) => p.status === 'completed')
+    .reduce((sum: number, p: Payment) => sum + parseFloat(p.amount.toString()), 0);
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -70,8 +76,31 @@ export default function Payments() {
         <Header title="Payment Management" description="Track and manage all customer payments" />
         
         <main className="flex-1 overflow-y-auto p-6 space-y-6">
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {/* Loading State */}
+          {paymentsLoading && (
+            <div className="flex items-center justify-center p-8">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                <p className="text-muted-foreground">Loading payments...</p>
+              </div>
+            </div>
+          )}
+
+          {/* Error State */}
+          {paymentsError && (
+            <Card>
+              <CardContent className="p-6 text-center">
+                <p className="text-red-600 mb-2">Error loading payments</p>
+                <p className="text-sm text-muted-foreground">Please try refreshing the page</p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Main Content */}
+          {!paymentsLoading && !paymentsError && (
+            <>
+              {/* Stats Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center">
@@ -344,6 +373,8 @@ export default function Payments() {
               </Button>
             </CardContent>
           </Card>
+            </>
+          )}
         </main>
       </div>
     </div>
