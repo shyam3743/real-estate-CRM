@@ -112,8 +112,8 @@ export default function ChannelPartners() {
       address: newPartner.address || null,
       commissionRate: newPartner.commissionRate ? newPartner.commissionRate.toString() : "0",
       totalLeads: 0,
-      totalSales: 0,
-      totalCommission: 0,
+      totalSales: "0",
+      totalCommission: "0",
       isActive: true,
     };
 

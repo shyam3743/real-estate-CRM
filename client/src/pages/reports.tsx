@@ -12,7 +12,11 @@ export default function Reports() {
   const [selectedReport, setSelectedReport] = useState("sales");
   const [dateRange, setDateRange] = useState("last-30-days");
 
-  const { data: metrics } = useQuery({
+  const { data: metrics } = useQuery<{
+    totalLeads: number;
+    conversionRate: number;
+    leadsBySource: { source: string; count: number }[];
+  }>({
     queryKey: ["/api/dashboard/metrics"],
   });
 
