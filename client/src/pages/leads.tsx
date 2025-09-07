@@ -154,7 +154,7 @@ export default function Leads() {
     const leadData: InsertLead = {
       firstName: newLead.firstName!,
       lastName: newLead.lastName!,
-      email: newLead.email || null,
+      email: newLead.email || undefined,
       phone: newLead.phone!,
       source: newLead.source as any,
       status: newLead.status as any,

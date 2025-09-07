@@ -123,6 +123,25 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Unit management routes
+  app.get("/api/units", async (req, res) => {
+    try {
+      // For now, we'll get all units from all projects
+      // In a real app, you might want pagination or project filtering
+      const projects = await storage.getAllProjects();
+      const allUnits: any[] = [];
+      
+      for (const project of projects) {
+        const units = await storage.getUnitsByProject(project.id);
+        allUnits.push(...units);
+      }
+      
+      res.json(allUnits);
+    } catch (error) {
+      console.error("Error fetching all units:", error);
+      res.status(500).json({ message: "Failed to fetch units" });
+    }
+  });
+
   app.get("/api/projects/:projectId/units", async (req, res) => {
     try {
       const units = await storage.getUnitsByProject(req.params.projectId);
@@ -228,6 +247,16 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Payment management routes
+  app.get("/api/payments", async (req, res) => {
+    try {
+      const payments = await storage.getAllPayments();
+      res.json(payments);
+    } catch (error) {
+      console.error("Error fetching all payments:", error);
+      res.status(500).json({ message: "Failed to fetch payments" });
+    }
+  });
+
   app.get("/api/bookings/:bookingId/payments", async (req, res) => {
     try {
       const payments = await storage.getPaymentsByBooking(req.params.bookingId);
